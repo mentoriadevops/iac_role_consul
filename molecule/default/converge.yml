@@ -1,7 +1,15 @@
 ---
 - name: Converge
   hosts: all
+  vars_files: 
+    - ../../defaults/main.yml
   tasks:
+    - name: instalado GNU PG2
+      apt:
+        update_cache: yes
+        name: gnupg2
+        state: present
     - name: "Include nome_da_role"
-      include_role:
-        name: "nome_da_role"
+      include_role: 
+        name: "iac_role_consul"
+      
