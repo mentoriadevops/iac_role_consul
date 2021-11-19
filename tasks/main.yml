@@ -1,2 +1,24 @@
 ---
 # tasks file for nome_da_role
+- name: "Adicionando chave apt da HashiCorp"
+  apt_key:
+    url: https://apt.releases.hashicorp.com/gpg
+    state: present
+- name: "Instalando repositório HashiCorp"
+  apt_repository:
+    repo: "deb [arch=amd64] https://apt.releases.hashicorp.com {{ ansible_facts['distribution_release'] }} main"
+    state: present
+    update_cache: yes
+- name: "Instalando consul"
+  apt:
+    name: "consul={{ consul_version }}"
+    state: present
+- name: removendo arquivo padrao do consul
+  file: 
+    path: "/etc/consul.d/consul.hcl"
+    state: absent
+- name: copiando arquivo de conf
+  copy: 
+    src: consul.hcl 
+    dest: /etc/consul.d/consul.hcl
+    mode: '0640'

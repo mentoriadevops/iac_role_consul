@@ -4,7 +4,14 @@
 - name: Verify
   hosts: all
   gather_facts: false
+  vars_files: 
+    - ../../defaults/main.yml
   tasks:
-  - name: Example assertion
-    assert:
-      that: true
+  - name: roda o comando consul
+    command: consul -version
+    register: consul_version_output
+  - name: verificar versao do consul
+    assert: 
+      that: 
+      - consul_version_output.rc == 0
+      - "'{{consul_version}}' in consul_version_output.stdout"
