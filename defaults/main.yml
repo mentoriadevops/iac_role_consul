@@ -1,3 +1,5 @@
 ---
 # defaults file for nome_da_role
 consul_version: "1.10.4"
+consul_user: "consul"
+consul_group: "consul"
