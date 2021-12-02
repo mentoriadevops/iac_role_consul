@@ -7,4 +7,9 @@ e este projeto segue o [Versionamento Semântico](https://semver.org/lang/pt-BR/
 
 ## [Não publicado]
 
+### Adicionado
+
+- Instalação inicial do Consul [[GH-2](https://github.com/mentoriaiac/iac_role_consul/pull/2)]
+- Cria arquivos de configuração e o script de bootstrap [[GH-3](https://github.com/mentoriaiac/iac_role_consul/pull/3)]
+
 [Não publicado]: https://github.com/mentoriaiac/iac-role-ATUALIZAR/compare/0.1.0...HEAD
