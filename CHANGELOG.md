@@ -7,6 +7,8 @@ e este projeto segue o [Versionamento Semântico](https://semver.org/lang/pt-BR/
 
 ## [Não publicado]
 
+## [0.1.0]
+
 ### Adicionado
 
 - Instalação inicial do Consul [[GH-2](https://github.com/mentoriaiac/iac_role_consul/pull/2)]
