@@ -7,7 +7,7 @@ e este projeto segue o [Versionamento Semântico](https://semver.org/lang/pt-BR/
 
 ## [Não publicado]
 
-## [0.1.0]
+## [0.1.0] - 2021-12-04
 
 ### Adicionado
 
