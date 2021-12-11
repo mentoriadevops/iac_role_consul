@@ -7,6 +7,10 @@ e este projeto segue o [Versionamento Semântico](https://semver.org/lang/pt-BR/
 
 ## [Não publicado]
 
+### Adicionado 
+
+- Adicionada configuração de acl,telemetry,connect, datacenter. [[GH-10](https://github.com/mentoriaiac/iac_role_consul/pull/10)]
+
 ## [0.1.0] - 2021-12-04
 
 ### Adicionado
