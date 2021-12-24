@@ -51,6 +51,7 @@ main() {
 render_server_config() {
   local bootstrap_expect="$1"
   local retry_join="${2:-\"127.0.0.1\"}"
+  local datacenter="${3:-dc1}"
 
   echo "Renderizando arquivo de configuração do server..."
 
@@ -62,16 +63,19 @@ render_server_config() {
   sed --expression "
     s/<BOOTSTRAP_EXPECT>/${bootstrap_expect}/
     s/<RETRY_JOIN>/${retry_join}/
+    s/<DATACENTER>/${datacenter}/
   " "${consul_config_path}/server.hcl.tpl" > "${consul_config_path}/consul.hcl"
 }
 
 render_agent_config() {
   local retry_join="${1:-\"127.0.0.1\"}"
+  local datacenter="${2:-dc1}"
 
   echo "Renderizando arquivo de configuração do agent..."
 
   sed --expression "
     s/<RETRY_JOIN>/${retry_join}/
+    s/<DATACENTER>/${datacenter}/
   " "${consul_config_path}/consul.hcl.tpl" > "${consul_config_path}/consul.hcl"
 }
 

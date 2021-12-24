@@ -1,10 +1,29 @@
 {% raw %}
 data_dir  = "/opt/consul"
 bind_addr = "{{ GetPrivateIP }}"
-
+datacenter = "<DATACENTER>"
 retry_join = [<RETRY_JOIN>]
+
+ports {
+  grpc = 8502
+}
 
 ui_config {
   enabled = true
+}
+
+connect {
+  enabled = true
+}
+
+acl {
+  enabled = true
+  default_policy = "deny"
+  enable_token_persistence = true
+}
+
+telemetry {
+  disable_hostname          = true
+  prometheus_retention_time = "30s"
 }
 {% endraw %}
