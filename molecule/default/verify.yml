@@ -33,34 +33,19 @@
         - name: "Verificar conteúdo do arquivo de configuração que foi renderizado"
           assert:
             that:
-              # Verificando que a configuração de bootstrap_expect está correta.
-              - "{{ bootstrap_expect_encontrado == bootstrap_expect_esperado }}"
-              # Verificando que a configuração de datacenter está correta.
-              - "{{ datacenter_encontrado == datacenter_esperado }}"
-              # Verificando que a configuração de retry_join está correta.
-              - "{{ retry_join_encontrado == retry_join_esperado }}"
+              - "{{ consul_bootstrap_config_file_content['content'] |
+                      b64decode |
+                      regex_search(item.regex, multiline=True)
+                    == item.esperado }}"
+          loop: "{{ testes }}"
           vars:
-            bootstrap_expect_regex: '^bootstrap_expect\s+=\s+(.+)$'
-            bootstrap_expect_encontrado: "{{
-              consul_bootstrap_config_file_content['content'] |
-              b64decode |
-              regex_search(bootstrap_expect_regex, multiline=True)
-            }}"
-            bootstrap_expect_esperado: "{{ 'bootstrap_expect = %d' | format(bootstrap_expect) }}"
-            datacenter_regex: '^datacenter\s+=\s+"(.+)"$'
-            datacenter_encontrado: "{{
-              consul_bootstrap_config_file_content['content'] |
-              b64decode |
-              regex_search(datacenter_regex, multiline=True)
-            }}"
-            datacenter_esperado: "{{ 'datacenter = \"%s\"' | format(datacenter) }}"
-            retry_join_regex: '^retry_join\s+=\s+\[(.+)\]$'
-            retry_join_encontrado: "{{
-              consul_bootstrap_config_file_content['content'] |
-              b64decode |
-              regex_search(retry_join_regex, multiline=True)
-            }}"
-            retry_join_esperado: "{{ 'retry_join = [%s]' | format(retry_join) }}"
+            testes:
+              - regex: '^bootstrap_expect\s+=\s+(.+)$'
+                esperado:  "{{ 'bootstrap_expect = %d' | format(bootstrap_expect) }}"
+              - regex: '^datacenter\s+=\s+"(.+)"$'
+                esperado: "{{ 'datacenter = \"%s\"' | format(datacenter) }}"
+              - regex: '^retry_join\s+=\s+\[(.+)\]$'
+                esperado: "{{ 'retry_join = [%s]' | format(retry_join) }}"
       vars:
         bootstrap_expect: 3
         datacenter: "dc2"
