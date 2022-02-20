@@ -17,36 +17,21 @@
         - "'{{consul_version}}' in consul_version_output.stdout"
 
     - name: "Testes para o script de bootstrap"
-      block:
-        - name: "Executar o script de bootstrap como server"
-          command: "/usr/local/bin/consul_bootstrap.sh server {{ bootstrap_expect }} '{{ retry_join }}' {{ datacenter }}"
-          register: consul_boostrap_output
-        - name: "Verificar que o script rodou com sucesso"
-          assert:
-            that:
-              - consul_boostrap_output.rc == 0
-
-        - name: "Ler conteúdo do arquivo de configuração que foi renderizado"
-          slurp:
-            src: "/etc/consul.d/consul.hcl"
-          register: consul_bootstrap_config_file_content
-        - name: "Verificar conteúdo do arquivo de configuração que foi renderizado"
-          assert:
-            that:
-              - "{{ consul_bootstrap_config_file_content['content'] |
-                      b64decode |
-                      regex_search(item.regex, multiline=True)
-                    == item.esperado }}"
-          loop: "{{ testes }}"
-          vars:
-            testes:
-              - regex: '^bootstrap_expect\s+=\s+(.+)$'
-                esperado:  "{{ 'bootstrap_expect = %d' | format(bootstrap_expect) }}"
-              - regex: '^datacenter\s+=\s+"(.+)"$'
-                esperado: "{{ 'datacenter = \"%s\"' | format(datacenter) }}"
-              - regex: '^retry_join\s+=\s+\[(.+)\]$'
-                esperado: "{{ 'retry_join = [%s]' | format(retry_join) }}"
+      include_tasks: verify_consul_bootstrap.yml
       vars:
-        bootstrap_expect: 3
-        datacenter: "dc2"
-        retry_join: '"provider=gce project_name=mentoria-iac tag_value=consul", "127.0.0.1"'
+        testes:
+          - nome: "modo server"
+            parametros: "server 3 '\"provider=gce project_name=mentoria-iac tag_value=consul\", \"127.0.0.1\"' dc2"
+            esperado:
+              server: "server = true"
+              bootstrap_expect: "bootstrap_expect = 3"
+              retry_join: 'retry_join = ["provider=gce project_name=mentoria-iac tag_value=consul", "127.0.0.1"]'
+              datacenter: 'datacenter = "dc2"'
+          - nome: "modo agent"
+            parametros: "agent '\"127.0.0.1\"' dc3"
+            esperado:
+              retry_join: 'retry_join = ["127.0.0.1"]'
+              datacenter: 'datacenter = "dc3"'
+      loop: "{{ testes }}"
+      loop_control:
+        loop_var: "teste"
