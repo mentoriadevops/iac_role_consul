@@ -4,14 +4,34 @@
 - name: Verify
   hosts: all
   gather_facts: false
-  vars_files: 
+  vars_files:
     - ../../defaults/main.yml
   tasks:
-  - name: roda o comando consul
-    command: consul -version
-    register: consul_version_output
-  - name: verificar versao do consul
-    assert: 
-      that: 
-      - consul_version_output.rc == 0
-      - "'{{consul_version}}' in consul_version_output.stdout"
+    - name: roda o comando consul
+      command: consul -version
+      register: consul_version_output
+    - name: verificar versao do consul
+      assert:
+        that:
+        - consul_version_output.rc == 0
+        - "'{{consul_version}}' in consul_version_output.stdout"
+
+    - name: "Testes para o script de bootstrap"
+      include_tasks: verify_consul_bootstrap.yml
+      vars:
+        testes:
+          - nome: "modo server"
+            parametros: "server 3 '\"provider=gce project_name=mentoria-iac tag_value=consul\", \"127.0.0.1\"' dc2"
+            esperado:
+              server: "server = true"
+              bootstrap_expect: "bootstrap_expect = 3"
+              retry_join: 'retry_join = ["provider=gce project_name=mentoria-iac tag_value=consul", "127.0.0.1"]'
+              datacenter: 'datacenter = "dc2"'
+          - nome: "modo agent"
+            parametros: "agent '\"127.0.0.1\"' dc3"
+            esperado:
+              retry_join: 'retry_join = ["127.0.0.1"]'
+              datacenter: 'datacenter = "dc3"'
+      loop: "{{ testes }}"
+      loop_control:
+        loop_var: "teste"

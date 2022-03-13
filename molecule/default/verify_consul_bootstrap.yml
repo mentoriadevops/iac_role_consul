@@ -1,0 +1,53 @@
+---
+- block:
+  - name: "{{ task_name_prefix }}: executando o script"
+    command: "/usr/local/bin/consul_bootstrap.sh {{ teste.parametros }}"
+    register: consul_boostrap_output
+
+  - name: "{{ task_name_prefix }}: verificando que o script rodou com sucesso"
+    assert:
+      that:
+        - consul_boostrap_output.rc == 0
+
+  - name: "{{ task_name_prefix }}: lendo conteúdo do arquivo de configuração"
+    slurp:
+      src: "/etc/consul.d/consul.hcl"
+    register: consul_bootstrap_config_file_content
+
+  - name: "{{ task_name_prefix }}: verificando conteúdo do arquivo de configuração"
+    assert:
+      that:
+        - "{{ consul_bootstrap_config_file_content['content'] |
+                b64decode |
+                regex_search(item.regex, multiline=True)
+              == (item.esperado | length > 0) | ternary(item.esperado, none) }}"
+    loop: "{{ regex }}"
+    vars:
+      regex:
+        - regex: '^bootstrap_expect\s+=\s+(.+)$'
+          esperado: "{{ teste.esperado.bootstrap_expect | default('') }}"
+        - regex: '^datacenter\s+=\s+"(.+)"$'
+          esperado: "{{ teste.esperado.datacenter | default('') }}"
+        - regex: '^retry_join\s+=\s+\[(.+)\]$'
+          esperado: "{{ teste.esperado.retry_join | default('') }}"
+        - regex: '^server\s+=\s+(.+)$'
+          esperado: "{{ teste.esperado.server | default('') }}"
+
+  rescue:
+    - name: "{{ task_name_prefix }}: rescue: imprimindo valores para debug"
+      debug:
+        msg:
+          - "Conteúdo do arquivo de configuração"
+          - "{{ (consul_bootstrap_config_file_content['content'] | b64decode).split('\n') }}"
+    - name: "{{ task_name_prefix }}: rescue: testes falharam"
+      fail:
+        msg: "Testes falharam"
+
+  always:
+    - name: "{{ task_name_prefix }}: removendo arquivo de configuração"
+      file:
+        path: "/etc/consul.d/consul.hcl"
+        state: absent
+
+  vars:
+    task_name_prefix: "Testando script de bootstrap: {{ teste.nome }}"
