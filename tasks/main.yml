@@ -33,5 +33,3 @@
     src: consul_bootstrap.sh
     dest: /usr/local/bin/consul_bootstrap.sh
     mode: 0755
-
-
