@@ -1,25 +1,25 @@
 ---
 # tasks file for nome_da_role
 - name: "Adicionando chave apt da HashiCorp"
-  apt_key:
+  ansible.builtin.apt_key:
     url: https://apt.releases.hashicorp.com/gpg
     state: present
 - name: "Instalando repositório HashiCorp"
-  apt_repository:
+  ansible.builtin.apt_repository:
     repo: "deb [arch=amd64] https://apt.releases.hashicorp.com {{ ansible_facts['distribution_release'] }} main"
     state: present
     update_cache: yes
 - name: "Instalando consul"
-  apt:
+  ansible.builtin.apt:
     name: "consul={{ consul_version }}"
     state: present
 
 - name: "Removendo arquivo padrao do consul"
-  file:
+  ansible.builtin.file:
     path: "/etc/consul.d/consul.hcl"
     state: absent
 - name: "Criando o arquivo de configuração"
-  template:
+  ansible.builtin.template:
     src: "{{ item }}.j2"
     dest: "/etc/consul.d/{{ item }}.tpl"
     owner: "{{ consul_user }}"
@@ -29,7 +29,7 @@
     - consul.hcl
     - server.hcl
 - name: "Criando script de inicialização"
-  copy:
+  ansible.builtin.copy:
     src: consul_bootstrap.sh
     dest: /usr/local/bin/consul_bootstrap.sh
     mode: 0755
